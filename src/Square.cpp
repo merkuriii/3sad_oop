@@ -1,64 +1,39 @@
 #include "../include/Square.h"
-#include <cmath>
-#include <algorithm>
+#include <stdexcept>
 
-Square::Square(const Point& p1, const Point& p2, const Point& p3, const Point& p4)
-    : p1(p1), p2(p2), p3(p3), p4(p4) {}
+namespace {
 
-Point Square::center() const {
-    return Point((p1.x + p2.x + p3.x + p4.x) / 4,
-                 (p1.y + p2.y + p3.y + p4.y) / 4);
+double dist2(const Point& a, const Point& b) {
+    double dx = a.x - b.x;
+    double dy = a.y - b.y;
+    return dx * dx + dy * dy;
+}
+
+bool isSquare(const Point& p1,const Point& p2, const Point& p3,const Point& p4) {
+    double d = dist2(p1,p2);
+    return d!=0 &&
+           d==dist2(p2,p3) &&
+           d==dist2(p3,p4) &&
+           d==dist2(p4,p1) &&
+           dist2(p1,p3)==dist2(p2,p4);
+}
+
+}
+
+Square::Square(const Point& a,const Point& b, const Point& c,const Point& d) : Rectangle(a,b,c,d) {
+    if (!isSquare(a,b,c,d))
+        throw std::invalid_argument("Invalid square");
 }
 
 double Square::area() const {
-    double side = std::sqrt(std::pow(p2.x - p1.x, 2) + std::pow(p2.y - p1.y, 2));
-    return side * side;
+    return dist2(p1,p2);
 }
 
 void Square::print(std::ostream& os) const {
-    os << "Square: (" << p1.x << "," << p1.y << "), "
-       << "(" << p2.x << "," << p2.y << "), "
-       << "(" << p3.x << "," << p3.y << "), "
-       << "(" << p4.x << "," << p4.y << ")";
-}
-
-void Square::read(std::istream& is) {
-    is >> p1.x >> p1.y >> p2.x >> p2.y >> p3.x >> p3.y >> p4.x >> p4.y;
-}
-
-bool Square::operator==(const Figure& other) const {
-    const Square* s = dynamic_cast<const Square*>(&other);
-    if (!s) return false;
-
-    return p1 == s->p1 && p2 == s->p2 && p3 == s->p3 && p4 == s->p4;
+    os << "Square: ("<<p1.x<<","<<p1.y<<"), (" <<p2.x<<","<<p2.y<<"), ("
+       <<p3.x<<","<<p3.y<<"), (" <<p4.x<<","<<p4.y<<")";
 }
 
 std::unique_ptr<Figure> Square::clone() const {
     return std::make_unique<Square>(*this);
-}
-
-Square::Square(const Square& other) 
-    : p1(other.p1), p2(other.p2), p3(other.p3), p4(other.p4) {}
-
-Square::Square(Square&& other) noexcept
-    : p1(std::move(other.p1)), p2(std::move(other.p2)), p3(std::move(other.p3)), p4(std::move(other.p4)) {}
-
-Square& Square::operator=(const Square& other) {
-    if (this != &other) {
-        p1 = other.p1;
-        p2 = other.p2;
-        p3 = other.p3;
-        p4 = other.p4;
-    }
-    return *this;
-}
-
-Square& Square::operator=(Square&& other) noexcept {
-    if (this != &other) {
-        p1 = std::move(other.p1);
-        p2 = std::move(other.p2);
-        p3 = std::move(other.p3);
-        p4 = std::move(other.p4);
-    }
-    return *this;
 }

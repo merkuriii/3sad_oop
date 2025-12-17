@@ -9,7 +9,7 @@ if(MSVC)
 endif()
 
 add_executable(figures
-    src/main.cpp
+    main.cpp
     src/Triangle.cpp
     src/Square.cpp
     src/Rectangle.cpp
